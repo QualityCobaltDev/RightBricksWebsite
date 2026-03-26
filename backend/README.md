@@ -24,6 +24,9 @@ backend/
   app/sitemap.ts
   app/robots.ts
   app/listing/[slug]/page.tsx
+  app/verification/submit/page.tsx
+  app/moderation/cases/page.tsx
+  app/moderation/cases/[id]/page.tsx
   app/areas/[province]/page.tsx
   app/categories/[category]/page.tsx
   app/blog/[slug]/page.tsx
@@ -76,12 +79,25 @@ backend/
       homepage-sections.tsx
       bilingual-content.tsx
       json-ld.tsx
+    components/trust/
+      verification-status-pill.tsx
+      listing-trust-badge.tsx
+      verification-submission-form.tsx
+      report-listing-modal.tsx
+      moderation-queue-table.tsx
+      moderation-case-detail.tsx
+      rejection-reason-selector.tsx
+      fraud-signal-panel.tsx
+      audit-trail-panel.tsx
     seo/
       config.ts
       metadata.ts
       schema.ts
       sitemap.ts
       i18n.ts
+    trust/
+      types.ts
+      use-fraud-signals.ts
   prisma/seed.ts
   infra/docker/
     Dockerfile

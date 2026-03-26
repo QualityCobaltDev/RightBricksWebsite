@@ -108,3 +108,10 @@ sudo tail -f /var/log/nginx/error.log
 - Validate post-deploy:
   - `curl -I https://rightbricks.online/robots.txt`
   - `curl -I https://rightbricks.online/sitemap.xml`
+
+## 12. Private verification storage notes
+
+- Configure `S3_PRIVATE_BUCKET=rightbricks-private-kyc` in production env.
+- Keep this bucket private and deny anonymous reads.
+- Verification uploads should only use signed URLs from `/api/verification/upload-url`.
+- Never serve raw private bucket URLs in public pages.

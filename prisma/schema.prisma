@@ -181,6 +181,33 @@ enum MessageThreadStatus {
   BLOCKED
 }
 
+enum ReportTargetType {
+  LISTING
+  USER
+  MESSAGE
+}
+
+enum ReportStatus {
+  OPEN
+  IN_REVIEW
+  ACTION_TAKEN
+  DISMISSED
+}
+
+enum ModerationCaseStatus {
+  OPEN
+  INVESTIGATING
+  ACTIONED
+  CLOSED
+}
+
+enum ModerationActionType {
+  APPROVE
+  REJECT
+  SUSPEND
+  REQUEST_CHANGES
+}
+
 model User {
   id                    String              @id @default(cuid())
   email                 String              @unique @db.Citext
@@ -221,6 +248,10 @@ model User {
   sentMessages          Message[]            @relation("MessageSender")
   messageParticipantsA  MessageThread[]      @relation("ThreadParticipantA")
   messageParticipantsB  MessageThread[]      @relation("ThreadParticipantB")
+  reportsFiled          AbuseReport[]        @relation("ReportFiledBy")
+  moderationCasesOpened ModerationCase[]     @relation("CaseOpenedBy")
+  moderationCasesAssigned ModerationCase[]   @relation("CaseAssignedModerator")
+  moderationNotes       ModerationNote[]
   articlesCreated       CmsArticle[]         @relation("ArticleCreatedBy")
   articlesUpdated       CmsArticle[]         @relation("ArticleUpdatedBy")
   moderationActions     ModerationAction[]
@@ -529,6 +560,8 @@ model Listing {
   savedBy               SavedListing[]
   viewingRequests       ViewingRequest[]
   messageThreads        MessageThread[]
+  abuseReports          AbuseReport[]
+  moderationCases       ModerationCase[]
   moderationActions     ModerationAction[]
 
   @@index([listingType, status, deletedAt])
@@ -927,6 +960,69 @@ model ModerationAction {
 
   @@index([listingId, createdAt])
   @@index([moderatorId, createdAt])
+}
+
+model AbuseReport {
+  id                String           @id @default(cuid())
+  targetType        ReportTargetType @default(LISTING)
+  listingId         String?
+  reportedUserId    String?
+  reporterId        String?
+  reasonCode        String
+  description       String?
+  status            ReportStatus     @default(OPEN)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  listing           Listing?         @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  reporter          User?            @relation("ReportFiledBy", fields: [reporterId], references: [id], onDelete: SetNull)
+  moderationCases   ModerationCase[]
+
+  @@index([status, createdAt])
+  @@index([listingId, status])
+  @@index([reportedUserId, status])
+}
+
+model ModerationCase {
+  id                  String               @id @default(cuid())
+  listingId           String?
+  abuseReportId       String?
+  status              ModerationCaseStatus @default(OPEN)
+  priority            Int                  @default(3)
+  openedById          String?
+  assignedModeratorId String?
+  decision            ModerationActionType?
+  decisionReasonCode  String?
+  decisionAt          DateTime?
+  closedAt            DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  listing             Listing?             @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  abuseReport         AbuseReport?         @relation(fields: [abuseReportId], references: [id], onDelete: SetNull)
+  openedBy            User?                @relation("CaseOpenedBy", fields: [openedById], references: [id], onDelete: SetNull)
+  assignedModerator   User?                @relation("CaseAssignedModerator", fields: [assignedModeratorId], references: [id], onDelete: SetNull)
+  notes               ModerationNote[]
+
+  @@index([status, priority, createdAt])
+  @@index([assignedModeratorId, status, priority])
+  @@index([listingId, status])
+  @@index([abuseReportId, status])
+}
+
+model ModerationNote {
+  id                String         @id @default(cuid())
+  caseId            String
+  authorId          String
+  body              String
+  isInternal        Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+
+  moderationCase    ModerationCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  author            User           @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([caseId, createdAt])
+  @@index([authorId, createdAt])
 }
 
 model VerificationRequest {

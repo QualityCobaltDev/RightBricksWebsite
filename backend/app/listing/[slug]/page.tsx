@@ -5,6 +5,8 @@ import { buildMetadata } from "@/seo/metadata";
 import { listingSchema, breadcrumbSchema } from "@/seo/schema";
 import { localizedField, normalizeLocale } from "@/seo/i18n";
 import { JsonLd } from "@/components/cms/json-ld";
+import { ListingTrustBadge } from "@/components/trust/listing-trust-badge";
+import { ReportListingModal } from "@/components/trust/report-listing-modal";
 
 export async function generateMetadata({
   params,
@@ -19,7 +21,7 @@ export async function generateMetadata({
 
   const listing = await prisma.listing.findFirst({
     where: { slug, status: "PUBLISHED", deletedAt: null },
-    include: { translations: true, media: true },
+    include: { translations: true, media: true, owner: true },
   });
 
   if (!listing) return buildMetadata({ path: `/listing/${slug}`, noIndex: true });
@@ -45,7 +47,7 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const listing = await prisma.listing.findFirst({
     where: { slug, status: "PUBLISHED", deletedAt: null },
-    include: { translations: true, media: true },
+    include: { translations: true, media: true, owner: true },
   });
 
   if (!listing) notFound();
@@ -72,6 +74,13 @@ export default async function ListingPage({ params }: { params: Promise<{ slug: 
       ])} />
 
       <h1 className="text-3xl font-semibold">{title}</h1>
+      <div className="flex items-center gap-3">
+        <ListingTrustBadge
+          isVerified={listing.isVerified}
+          publisherVerified={listing.owner ? listing.owner.verificationStatus === "VERIFIED" : false}
+        />
+        <ReportListingModal listingId={listing.id} />
+      </div>
       <p className="text-lg">${listing.priceUsd.toString()}</p>
       <p>{description}</p>
     </main>
