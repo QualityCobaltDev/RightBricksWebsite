@@ -77,3 +77,13 @@ sudo systemctl restart rightbricks-backend.service
 docker compose -f infra/docker/docker-compose.yml exec app npx prisma migrate deploy
 docker compose -f infra/docker/docker-compose.yml exec app npm run seed
 ```
+
+## Dashboard routes
+
+- `/dashboard/owner`
+- `/dashboard/agent`
+- `/dashboard/agency-admin`
+- `/dashboard/developer`
+- `/dashboard/moderator`
+- `/dashboard/content-editor`
+- `/dashboard/super-admin`
