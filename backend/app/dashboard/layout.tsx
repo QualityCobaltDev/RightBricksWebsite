@@ -15,12 +15,12 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   ]);
 
   return (
-    <div className="min-h-screen bg-slate-100 flex">
+    <div style={{ minHeight: "100vh", display: "flex", background: "#eef2ff" }}>
       <SidebarNav roles={roles} />
-      <main className="flex-1 p-6 space-y-4">
-        <header className="bg-white rounded border p-4">
-          <h1 className="text-xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-slate-500">{user.email}</p>
+      <main style={{ flex: 1, padding: "1rem" }}>
+        <header className="rb-card" style={{ marginBottom: 12 }}>
+          <h1 style={{ marginTop: 0 }}>Dashboard</h1>
+          <p className="rb-muted" style={{ marginBottom: 0 }}>{user.email}</p>
         </header>
         {children}
       </main>
