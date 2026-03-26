@@ -20,6 +20,10 @@ const EnvSchema = z.object({
   SEARCH_PROVIDER: z.enum(["opensearch", "postgres"]).default("opensearch"),
   SEARCH_URL: z.string().url(),
   SEARCH_INDEX_LISTINGS: z.string().default("rightbricks_listings_v1"),
+  MAP_STYLE_URL: z.string().url(),
+  MAP_DEFAULT_LAT: z.coerce.number(),
+  MAP_DEFAULT_LNG: z.coerce.number(),
+  MAP_DEFAULT_ZOOM: z.coerce.number().default(12),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
 });
 

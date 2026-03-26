@@ -19,6 +19,8 @@ backend/
     cms/articles/route.ts
     seo/metadata/route.ts
     audit/route.ts
+  app/search/page.tsx
+  app/search/[scope]/[mode]/page.tsx
   src/
     config/env.ts
     lib/
@@ -45,6 +47,23 @@ backend/
       listings.ts
       inquiries.ts
       cms.ts
+    search/
+      types.ts
+      filters.ts
+      url.ts
+      query-builder.ts
+      ranking.ts
+      use-search-state.ts
+    components/search/
+      filter-sidebar.tsx
+      mobile-filter-drawer.tsx
+      search-results-header.tsx
+      active-filter-chips.tsx
+      save-search-modal.tsx
+      alert-creation-flow.tsx
+      map-list-toggle.tsx
+      result-list.tsx
+      map-placeholder.tsx
   prisma/seed.ts
   infra/docker/
     Dockerfile
