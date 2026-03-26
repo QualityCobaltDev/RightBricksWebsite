@@ -97,6 +97,46 @@ async function main() {
     },
   });
 
+  const daunPenh = await prisma.district.upsert({
+    where: { provinceId_slug: { provinceId: phnomPenh.id, slug: "daun-penh" } },
+    update: {},
+    create: {
+      provinceId: phnomPenh.id,
+      code: "1202",
+      slug: "daun-penh",
+      nameEn: "Daun Penh",
+      nameKm: "ដូនពេញ",
+    },
+  });
+
+  await prisma.commune.upsert({
+    where: { districtId_slug: { districtId: daunPenh.id, slug: "phsar-kandal-ti-muoy" } },
+    update: {},
+    create: {
+      districtId: daunPenh.id,
+      code: "120201",
+      slug: "phsar-kandal-ti-muoy",
+      nameEn: "Phsar Kandal I",
+      nameKm: "ផ្សារកណ្ដាលទី១",
+    },
+  });
+
+  await prisma.amenity.upsert({
+    where: { code: "AIR_CONDITIONING" },
+    update: {},
+    create: { code: "AIR_CONDITIONING", nameEn: "Air Conditioning", nameKm: "ម៉ាស៊ីនត្រជាក់", category: "comfort" },
+  });
+  await prisma.amenity.upsert({
+    where: { code: "SECURITY_24_7" },
+    update: {},
+    create: { code: "SECURITY_24_7", nameEn: "24/7 Security", nameKm: "សន្តិសុខ ២៤/៧", category: "security" },
+  });
+  await prisma.amenity.upsert({
+    where: { code: "PARKING" },
+    update: {},
+    create: { code: "PARKING", nameEn: "Parking", nameKm: "ចំណតរថយន្ត", category: "mobility" },
+  });
+
   const superAdminEmail = process.env.SEED_SUPER_ADMIN_EMAIL;
   const superAdminPassword = process.env.SEED_SUPER_ADMIN_PASSWORD;
 

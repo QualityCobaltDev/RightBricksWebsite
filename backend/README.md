@@ -106,6 +106,7 @@ backend/
   docs/deployment-ubuntu-24.04.md
   .env.example
   .env.production.example
+  .env.production.template
   package.json
   tsconfig.json
   next.config.ts
@@ -140,3 +141,27 @@ docker compose -f infra/docker/docker-compose.yml exec app npm run seed
 - `/dashboard/moderator`
 - `/dashboard/content-editor`
 - `/dashboard/super-admin`
+
+## Trust and moderation routes
+
+- `/verification/submit`
+- `/moderation/cases`
+- `/moderation/cases/[id]`
+
+## Final setup + deployment docs
+
+- Main deployment guide: `docs/runbooks/PRODUCTION_DEPLOYMENT_UBUNTU_24_04.md`
+- VPS trust/security guide: `docs/trust-security-ubuntu-24.04.md`
+- Nginx site config: `infra/nginx/rightbricks.online.conf`
+- systemd service: `infra/systemd/rightbricks-backend.service`
+- backup script: `infra/scripts/backup.sh`
+- restore script: `infra/scripts/restore.sh`
+- deploy script: `infra/scripts/deploy.sh`
+- rollback script: `infra/scripts/rollback.sh`
+
+## Known future enhancements
+
+- Replace private-upload scaffolding with real S3 pre-signed URL generation using AWS SDK v3.
+- Add background workers for asynchronous moderation scoring and antivirus scanning.
+- Add object lifecycle + legal hold workflows for compliance-grade verification document retention.
+- Add analytics dashboards for trust metrics (false positives, moderator SLA, report resolution time).
