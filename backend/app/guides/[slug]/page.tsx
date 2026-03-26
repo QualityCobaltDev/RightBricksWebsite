@@ -46,7 +46,9 @@ export default async function GuidePage({ params, searchParams }: { params: Prom
   const km = article.translations.find((t) => t.locale === LocaleCode.KM);
 
   return (
-    <main className="max-w-4xl mx-auto p-6 space-y-4">
+    <main className="rb-container" style={{ padding: "1rem" }}>
+      <article className="rb-card" style={{ marginBottom: 14 }}>
+        <p className="rb-muted" style={{ marginTop: 0 }}><a href="/">Home</a> / Guides</p>
       <JsonLd data={articleSchema({
         headline: en?.title ?? km?.title ?? article.slug,
         description: en?.excerpt ?? km?.excerpt ?? "",
@@ -69,6 +71,7 @@ export default async function GuidePage({ params, searchParams }: { params: Prom
         bodyEn: en?.body,
         bodyKm: km?.body,
       }} />
+          </article>
     </main>
   );
 }

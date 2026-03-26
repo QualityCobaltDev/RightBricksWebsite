@@ -8,20 +8,26 @@ export default async function VerificationSubmitPage() {
   const statuses = await getVerificationStatuses(user.id);
 
   return (
-    <main className="max-w-4xl mx-auto p-6 space-y-4">
+    <main className="rb-container" style={{ padding: "1rem" }}>
+      <section className="rb-card" style={{ marginBottom: 14 }}>
+        <h1 style={{ marginTop: 0 }}>Verification center</h1>
+        <p className="rb-muted">Submit business or identity documentation to unlock verified trust indicators across listings and profile surfaces.</p>
+      </section>
       <VerificationSubmissionForm />
 
-      <section className="rounded border bg-white p-4 space-y-2">
-        <h2 className="font-semibold">Your Verification History</h2>
-        {statuses.userRequests.map((item) => (
-          <article key={item.id} className="border rounded p-2 flex items-center justify-between">
-            <div>
-              <p className="text-sm">{item.requestedType}</p>
-              <p className="text-xs text-slate-500">{item.createdAt.toISOString()}</p>
+      <section className="rb-card" style={{ marginTop: 14 }}>
+        <h2 style={{ marginTop: 0 }}>Your verification history</h2>
+        {statuses.userRequests.length ? statuses.userRequests.map((item) => (
+          <article key={item.id} className="rb-card" style={{ padding: 10, marginBottom: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+              <div>
+                <p style={{ margin: 0, fontWeight: 600 }}>{item.requestedType}</p>
+                <p className="rb-muted" style={{ margin: 0 }}>{item.createdAt.toISOString()}</p>
+              </div>
+              <VerificationStatusPill status={item.status} />
             </div>
-            <VerificationStatusPill status={item.status} />
           </article>
-        ))}
+        )) : <p className="rb-muted">No submissions yet.</p>}
       </section>
     </main>
   );

@@ -7,8 +7,11 @@ export default async function ModerationCasesPage() {
   const cases = await listModerationCases();
 
   return (
-    <main className="max-w-6xl mx-auto p-6 space-y-4">
-      <h1 className="text-2xl font-semibold">Moderation Queue</h1>
+    <main className="rb-container" style={{ padding: "1rem" }}>
+      <section className="rb-card" style={{ marginBottom: 14 }}>
+        <h1 style={{ marginTop: 0 }}>Moderation cases</h1>
+        <p className="rb-muted">Review case context, prioritize risk, and process decisions with clear operational visibility.</p>
+      </section>
       <ModerationQueueTable rows={cases.map((c) => ({
         id: c.id,
         listingTitle: c.listing?.translations[0]?.title ?? c.listing?.slug ?? "Unknown",

@@ -14,7 +14,7 @@ export default async function HomePage() {
   const [listings, guides] = await Promise.all([
     prisma.listing.findMany({
       where: { status: "PUBLISHED", deletedAt: null },
-      include: { translations: true },
+      include: { translations: true, province: true },
       orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
       take: 9,
     }),
@@ -27,7 +27,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <main className="max-w-6xl mx-auto p-6 space-y-6">
+    <main className="rb-container" style={{ paddingTop: 12, paddingBottom: 24 }}>
       <JsonLd data={organizationSchema()} />
       <HomepageSections
         featuredListings={listings.map((listing) => ({
@@ -35,6 +35,8 @@ export default async function HomePage() {
           slug: listing.slug,
           title: listing.translations[0]?.title ?? listing.slug,
           priceUsd: listing.priceUsd.toString(),
+          province: listing.province.nameEn,
+          isVerified: listing.isVerified,
         }))}
         featuredGuides={guides.map((guide) => ({
           id: guide.id,
