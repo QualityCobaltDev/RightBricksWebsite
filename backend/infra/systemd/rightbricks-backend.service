@@ -1,0 +1,16 @@
+[Unit]
+Description=RightBricks Backend (Next.js)
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/rightbricks/current/backend
+ExecStart=/usr/bin/docker compose -f /opt/rightbricks/current/backend/infra/docker/docker-compose.yml up -d --build
+ExecStop=/usr/bin/docker compose -f /opt/rightbricks/current/backend/infra/docker/docker-compose.yml down
+ExecReload=/usr/bin/docker compose -f /opt/rightbricks/current/backend/infra/docker/docker-compose.yml up -d --build
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
