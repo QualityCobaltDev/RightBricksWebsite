@@ -1,0 +1,29 @@
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+    container_name: rightbricks_app
+    env_file:
+      - ../../.env.production
+    depends_on:
+      - postgres
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    container_name: rightbricks_postgres
+    environment:
+      POSTGRES_DB: rightbricks_prod
+      POSTGRES_USER: rightbricks_app
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - rightbricks_pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    restart: unless-stopped
+
+volumes:
+  rightbricks_pgdata:

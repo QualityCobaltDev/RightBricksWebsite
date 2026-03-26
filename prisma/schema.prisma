@@ -167,6 +167,20 @@ enum AuditSeverity {
   CRITICAL
 }
 
+enum ViewingRequestStatus {
+  PENDING
+  CONFIRMED
+  RESCHEDULED
+  COMPLETED
+  CANCELED
+}
+
+enum MessageThreadStatus {
+  OPEN
+  ARCHIVED
+  BLOCKED
+}
+
 model User {
   id                    String              @id @default(cuid())
   email                 String              @unique @db.Citext
@@ -200,7 +214,13 @@ model User {
   inquiriesCreated      Inquiry[]            @relation("InquiryCreatedBy")
   inquiriesAssigned     Inquiry[]            @relation("InquiryAssignedTo")
   savedListings         SavedListing[]
+  savedSearches         SavedSearch[]
   searchAlerts          SearchAlert[]
+  viewingRequests       ViewingRequest[]     @relation("ViewingRequester")
+  viewingAssignments    ViewingRequest[]     @relation("ViewingAgent")
+  sentMessages          Message[]            @relation("MessageSender")
+  messageParticipantsA  MessageThread[]      @relation("ThreadParticipantA")
+  messageParticipantsB  MessageThread[]      @relation("ThreadParticipantB")
   articlesCreated       CmsArticle[]         @relation("ArticleCreatedBy")
   articlesUpdated       CmsArticle[]         @relation("ArticleUpdatedBy")
   moderationActions     ModerationAction[]
@@ -507,6 +527,8 @@ model Listing {
   amenityLinks          ListingAmenity[]
   inquiries             Inquiry[]
   savedBy               SavedListing[]
+  viewingRequests       ViewingRequest[]
+  messageThreads        MessageThread[]
   moderationActions     ModerationAction[]
 
   @@index([listingType, status, deletedAt])
@@ -711,6 +733,7 @@ model Inquiry {
   project             Project?       @relation(fields: [projectId], references: [id], onDelete: SetNull)
   createdBy           User?          @relation("InquiryCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   assignedTo          User?          @relation("InquiryAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
+  messageThreads      MessageThread[]
 
   @@index([status, createdAt])
   @@index([listingId, status])
@@ -735,6 +758,7 @@ model SavedListing {
 model SearchAlert {
   id                String      @id @default(cuid())
   userId            String
+  savedSearchId     String?
   name              String
   locale            LocaleCode  @default(EN)
   listingType       ListingType?
@@ -753,9 +777,99 @@ model SearchAlert {
   updatedAt         DateTime    @updatedAt
 
   user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savedSearch       SavedSearch? @relation(fields: [savedSearchId], references: [id], onDelete: SetNull)
 
   @@index([userId, isActive])
   @@index([provinceId, districtId, isActive])
+}
+
+model SavedSearch {
+  id                String      @id @default(cuid())
+  userId            String
+  name              String
+  locale            LocaleCode  @default(EN)
+  listingType       ListingType?
+  propertyTypes     PropertyType[]
+  provinceId        String?
+  districtId        String?
+  minPriceUsd       Decimal?    @db.Decimal(14, 2)
+  maxPriceUsd       Decimal?    @db.Decimal(14, 2)
+  minBedrooms       Int?
+  maxBedrooms       Int?
+  isActive          Boolean     @default(true)
+  deletedAt         DateTime?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alerts            SearchAlert[]
+
+  @@index([userId, isActive])
+  @@index([provinceId, districtId, isActive])
+}
+
+model ViewingRequest {
+  id                String               @id @default(cuid())
+  listingId         String
+  requesterId       String
+  assignedAgentId   String?
+  requestedAt       DateTime
+  status            ViewingRequestStatus @default(PENDING)
+  note              String?
+  canceledReason    String?
+  confirmedAt       DateTime?
+  completedAt       DateTime?
+  deletedAt         DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  listing           Listing              @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  requester         User                 @relation("ViewingRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  assignedAgent     User?                @relation("ViewingAgent", fields: [assignedAgentId], references: [id], onDelete: SetNull)
+
+  @@index([listingId, status, requestedAt])
+  @@index([requesterId, status, requestedAt])
+  @@index([assignedAgentId, status, requestedAt])
+}
+
+model MessageThread {
+  id                String               @id @default(cuid())
+  listingId         String?
+  inquiryId         String?
+  participantAId    String
+  participantBId    String
+  status            MessageThreadStatus  @default(OPEN)
+  lastMessageAt     DateTime?
+  archivedAt        DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+
+  listing           Listing?             @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  inquiry           Inquiry?             @relation(fields: [inquiryId], references: [id], onDelete: SetNull)
+  participantA      User                 @relation("ThreadParticipantA", fields: [participantAId], references: [id], onDelete: Cascade)
+  participantB      User                 @relation("ThreadParticipantB", fields: [participantBId], references: [id], onDelete: Cascade)
+  messages          Message[]
+
+  @@index([participantAId, status, updatedAt])
+  @@index([participantBId, status, updatedAt])
+  @@index([listingId, updatedAt])
+}
+
+model Message {
+  id                String      @id @default(cuid())
+  threadId          String
+  senderId          String
+  body              String
+  isSystem          Boolean     @default(false)
+  readAt            DateTime?
+  deletedAt         DateTime?
+  createdAt         DateTime    @default(now())
+
+  thread            MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender            User        @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
+  @@index([senderId, createdAt])
 }
 
 model CmsArticle {
