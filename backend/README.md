@@ -21,6 +21,14 @@ backend/
     audit/route.ts
   app/search/page.tsx
   app/search/[scope]/[mode]/page.tsx
+  app/sitemap.ts
+  app/robots.ts
+  app/listing/[slug]/page.tsx
+  app/areas/[province]/page.tsx
+  app/categories/[category]/page.tsx
+  app/blog/[slug]/page.tsx
+  app/guides/[slug]/page.tsx
+  app/[slug]/page.tsx
   src/
     config/env.ts
     lib/
@@ -64,6 +72,16 @@ backend/
       map-list-toggle.tsx
       result-list.tsx
       map-placeholder.tsx
+    components/cms/
+      homepage-sections.tsx
+      bilingual-content.tsx
+      json-ld.tsx
+    seo/
+      config.ts
+      metadata.ts
+      schema.ts
+      sitemap.ts
+      i18n.ts
   prisma/seed.ts
   infra/docker/
     Dockerfile

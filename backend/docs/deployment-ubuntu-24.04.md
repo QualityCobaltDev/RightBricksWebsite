@@ -96,3 +96,15 @@ sudo systemctl restart rightbricks-backend.service
 docker compose -f /opt/rightbricks/backend/backend/infra/docker/docker-compose.yml logs -f app
 sudo tail -f /var/log/nginx/error.log
 ```
+
+## 11. Nginx-friendly sitemap and robots notes
+
+- Ensure `https://rightbricks.online/sitemap.xml` and `https://rightbricks.online/robots.txt` are proxied directly to Next.js.
+- Do not rewrite these endpoints to static files unless you introduce a static sitemap build step.
+- Recommended cache policy:
+  - `robots.txt`: short cache (5–15 minutes)
+  - `sitemap.xml`: moderate cache (30–60 minutes)
+- Keep gzip enabled for `application/xml` responses.
+- Validate post-deploy:
+  - `curl -I https://rightbricks.online/robots.txt`
+  - `curl -I https://rightbricks.online/sitemap.xml`
